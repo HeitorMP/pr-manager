@@ -14,6 +14,7 @@ from textual.binding import Binding
 from textual.containers import Container
 from textual.widgets import Footer, Header, ListItem, ListView, Static
 
+from comment_screen import CommentScreen
 from pr_detail_view import PRDetailView
 from pr_files_view import PRFilesView
 from pr_list_view import PRListView
@@ -137,6 +138,27 @@ class PRManagerApp(App):
             self.filtered_repo = result
             self._update_subtitle()
             self._apply_repo_filter()
+    
+    def clear_all_filters(self) -> None:
+        """Clear all active filters"""
+        self.filtered_repo = None
+        self._update_subtitle()
+        self._apply_repo_filter()
+    
+    def open_comment_dialog(self, pr: PullRequest.PullRequest) -> None:
+        """Open comment dialog for a PR"""
+        self.push_screen(CommentScreen(pr.number), lambda result: self._handle_comment_result(pr, result))
+    
+    def _handle_comment_result(self, pr: PullRequest.PullRequest, comment: str | None) -> None:
+        """Handle the result from the comment screen"""
+        if comment:
+            try:
+                # Post the comment to the PR
+                pr.create_issue_comment(comment)
+                # Show success message (you could add a notification widget here)
+                self.notify(f"Comment added to PR #{pr.number}", severity="information", timeout=3)
+            except Exception as e:
+                self.notify(f"Error adding comment: {str(e)}", severity="error", timeout=5)
     
     def _apply_repo_filter(self) -> None:
         """Apply repository filter to PRs"""

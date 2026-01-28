@@ -18,11 +18,16 @@ class PRDetailView(VerticalScroll):
         Binding("pagedown", "page_down", "Page Down", show=False),
         Binding("pageup", "page_up", "Page Up", show=False),
         Binding("d", "view_files", "View Files", show=True),
+        Binding("m", "add_comment", "Add Comment", show=True),
     ]
     
     def action_view_files(self) -> None:
         """Show file changes for this PR"""
         self.app.show_pr_files(self.pr)
+    
+    def action_add_comment(self) -> None:
+        """Open dialog to add comment to this PR"""
+        self.app.open_comment_dialog(self.pr)
 
     def __init__(self, pr: PullRequest.PullRequest):
         super().__init__()
